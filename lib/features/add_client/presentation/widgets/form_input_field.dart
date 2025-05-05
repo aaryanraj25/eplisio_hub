@@ -17,6 +17,10 @@ class FormInputField extends StatelessWidget {
   final VoidCallback? onTap;
   final Function(String)? onChanged;
 
+  final Color? textColor;
+  final Color? prefixIconColor;
+  final Color? labelColor;
+
   const FormInputField({
     Key? key,
     required this.controller,
@@ -33,18 +37,30 @@ class FormInputField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.onChanged,
+    this.textColor,
+    this.labelColor,
+    this.prefixIconColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      style: TextStyle(color: textColor ?? Colors.black),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        labelStyle: TextStyle(color: labelColor ?? Colors.grey),
+        hintStyle: TextStyle(color: textColor?.withOpacity(0.6) ?? Colors.grey[600]),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: prefixIconColor ?? Colors.grey)
+            : null,
         suffix: suffix,
         border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: prefixIconColor ?? Colors.blue),
           borderRadius: BorderRadius.circular(8),
         ),
         contentPadding: const EdgeInsets.symmetric(

@@ -7,19 +7,12 @@ import 'package:get/get.dart';
 class ClientBinding extends Bindings {
   @override
   void dependencies() {
-    // ApiClient singleton
     Get.lazyPut<ApiClient>(() => ApiClient(), fenix: true);
-    
-    // Repositories
     Get.lazyPut<ClientRepository>(
       () => ClientRepository(Get.find<ApiClient>()),
       fenix: true,
     );
-
     Get.lazyPut(() => HospitalRepository(apiClient: Get.find()));
-    
-    
-    // Controllers
     Get.lazyPut<ClientController>(
       () => ClientController(
         clientRepository: Get.find<ClientRepository>(),

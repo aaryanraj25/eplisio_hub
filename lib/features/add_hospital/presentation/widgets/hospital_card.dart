@@ -1,3 +1,4 @@
+import 'package:eplisio_hub/core/constants/app_colors.dart';
 import 'package:eplisio_hub/features/add_hospital/data/model/hospital_model.dart';
 import 'package:eplisio_hub/features/add_hospital/presentation/widgets/info_chip.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,7 @@ class HospitalCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.amber,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(

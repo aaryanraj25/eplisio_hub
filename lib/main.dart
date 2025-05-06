@@ -35,6 +35,25 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.light(
+          primary: AppColors.primary,
+          secondary: AppColors.primary,
+          background: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black,
+        ),
+        cardColor: Colors.white,
+        canvasColor: Colors.white,
+        dialogBackgroundColor: Colors.white,
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          focusColor: Colors.white,
+          hoverColor: Colors.white,
+        ),
+        buttonTheme: ButtonThemeData(
+          buttonColor: Colors.white,
+        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,

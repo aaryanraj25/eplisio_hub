@@ -77,6 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
               const Text(
                 'Eplisio Hub',
                 style: AppTextStyles.heading1,
+                
               ),
               const SizedBox(height: 40),
               const CircularProgressIndicator(

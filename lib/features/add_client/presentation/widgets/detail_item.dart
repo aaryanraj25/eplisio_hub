@@ -1,3 +1,4 @@
+import 'package:eplisio_hub/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class DetailItem extends StatelessWidget {
@@ -24,7 +25,7 @@ class DetailItem extends StatelessWidget {
           Icon(
             icon,
             size: 20,
-            color: Colors.grey[600],
+            color: AppColors.primary
           ),
           const SizedBox(width: 16),
           Expanded(

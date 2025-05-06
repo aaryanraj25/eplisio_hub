@@ -31,8 +31,6 @@ class HomeScreen extends GetView<HomeController> {
                     _buildSalesTrend(),
                     const SizedBox(height: 24),
                     _buildEmployeeSection(),
-                    const SizedBox(height: 24),
-                    _buildProductSection(),
                   ],
                 ),
               ),

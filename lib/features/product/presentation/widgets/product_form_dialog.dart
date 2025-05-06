@@ -455,7 +455,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(isEditing ? Icons.save : Icons.add, size: 18),
+              Icon(isEditing ? Icons.save : Icons.add, size: 18, color: Colors.white),
               const SizedBox(width: 6),
               Text(
                 isEditing ? 'Update' : 'Add',

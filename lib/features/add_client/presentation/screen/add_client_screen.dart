@@ -13,15 +13,9 @@ class ClientsScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Clients Management'),
+        title: const Text('Clients'),
+        centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              
-            },
-            tooltip: 'Filter Clients',
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => controller.fetchClients(),

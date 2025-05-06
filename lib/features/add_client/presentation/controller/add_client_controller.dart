@@ -1,3 +1,4 @@
+import 'package:eplisio_hub/core/enums/client_capacity.dart';
 import 'package:eplisio_hub/features/add_client/data/model/add_client_model.dart';
 import 'package:eplisio_hub/features/add_client/data/repo/add_client_repo.dart';
 import 'package:eplisio_hub/features/add_hospital/data/model/hospital_model.dart';
@@ -20,20 +21,20 @@ class ClientController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isSubmitting = false.obs;
   final RxString error = ''.obs;
-  
+
   // Selected client for details/editing
   final Rx<AddClientModel?> selectedClient = Rx<AddClientModel?>(null);
-  
+
   // Form controllers
   final nameController = TextEditingController();
   final designationController = TextEditingController();
   final departmentController = TextEditingController();
   final mobileController = TextEditingController();
   final emailController = TextEditingController();
-  
+
   // Fixed capacity as 'admin'
-  final String capacity = 'admin';
-  
+  final Rx<ClientCapacity> selectedCapacity = ClientCapacity.END_USER.obs;
+
   final Rx<String?> selectedHospitalId = Rx<String?>(null);
 
   @override
@@ -88,7 +89,7 @@ class ClientController extends GetxController {
       error.value = '';
       final client = await clientRepository.getClientById(clientId);
       selectedClient.value = client;
-      
+
       // Populate form controllers
       populateFormControllers(client);
     } catch (e) {
@@ -98,14 +99,23 @@ class ClientController extends GetxController {
     }
   }
 
+  List<DropdownMenuItem<ClientCapacity>> get capacityItems {
+    return ClientCapacity.values.map((capacity) {
+      return DropdownMenuItem(
+        value: capacity,
+        child: Text(capacity.displayName),
+      );
+    }).toList();
+  }
+
   // Create a new client
   Future<void> createClient() async {
     if (!validateForm()) return;
-    
+
     try {
       isSubmitting.value = true;
       error.value = '';
-      
+
       final newClient = AddClientModel(
         name: nameController.text,
         designation: designationController.text,
@@ -113,13 +123,13 @@ class ClientController extends GetxController {
         clinicId: selectedHospitalId.value!,
         mobile: mobileController.text,
         email: emailController.text,
-        capacity: capacity, // Always set to 'admin'
+        capacity: selectedCapacity.value.value,
       );
-      
+
       await clientRepository.createClient(newClient);
       resetForm();
       await fetchClients();
-      Get.back(); // Return to list screen
+      Get.back();
       Get.snackbar(
         'Success',
         'Client created successfully',
@@ -144,11 +154,11 @@ class ClientController extends GetxController {
   // Update an existing client
   Future<void> updateClient() async {
     if (!validateForm() || selectedClient.value == null) return;
-    
+
     try {
       isSubmitting.value = true;
       error.value = '';
-      
+
       final updatedClient = AddClientModel(
         id: selectedClient.value!.id,
         name: nameController.text,
@@ -157,16 +167,16 @@ class ClientController extends GetxController {
         clinicId: selectedHospitalId.value!,
         mobile: mobileController.text,
         email: emailController.text,
-        capacity: capacity, // Always set to 'admin'
+        capacity: selectedCapacity.value.value,
       );
-      
+
       await clientRepository.updateClient(
         selectedClient.value!.id!,
         updatedClient,
       );
-      
+
       await fetchClients();
-      Get.back(); // Return to list screen
+      Get.back();
       Get.snackbar(
         'Success',
         'Client updated successfully',
@@ -225,7 +235,7 @@ class ClientController extends GetxController {
         name: name,
         email: email,
         clinicId: hospitalId,
-        capacity: capacity, // Always filter for 'admin'
+        capacity: selectedCapacity.value.value, // Always filter for 'admin'
       );
       clients.value = filteredClients;
     } catch (e) {
@@ -236,6 +246,7 @@ class ClientController extends GetxController {
   }
 
   // Reset form
+  // Reset form
   void resetForm() {
     nameController.clear();
     designationController.clear();
@@ -243,6 +254,7 @@ class ClientController extends GetxController {
     mobileController.clear();
     emailController.clear();
     selectedHospitalId.value = null;
+    selectedCapacity.value = ClientCapacity.END_USER;
     selectedClient.value = null;
     error.value = '';
   }
@@ -255,6 +267,7 @@ class ClientController extends GetxController {
     mobileController.text = client.mobile;
     emailController.text = client.email;
     selectedHospitalId.value = client.clinicId;
+    selectedCapacity.value = ClientCapacity.fromString(client.capacity);
   }
 
   // Validate form
@@ -279,7 +292,8 @@ class ClientController extends GetxController {
       error.value = 'Mobile number is required';
       return false;
     }
-    if (emailController.text.isEmpty || !GetUtils.isEmail(emailController.text)) {
+    if (emailController.text.isEmpty ||
+        !GetUtils.isEmail(emailController.text)) {
       error.value = 'Valid email is required';
       return false;
     }
@@ -288,7 +302,8 @@ class ClientController extends GetxController {
 
   // Get hospital name by ID
   String getHospitalNameById(String hospitalId) {
-    final hospital = hospitals.firstWhereOrNull((hospital) => hospital.id == hospitalId);
+    final hospital =
+        hospitals.firstWhereOrNull((hospital) => hospital.id == hospitalId);
     return hospital?.name ?? 'Unknown Hospital';
   }
 }

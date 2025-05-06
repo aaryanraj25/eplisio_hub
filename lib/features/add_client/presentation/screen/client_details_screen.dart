@@ -1,3 +1,4 @@
+import 'package:eplisio_hub/core/constants/app_colors.dart';
 import 'package:eplisio_hub/features/add_client/presentation/controller/add_client_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,41 +13,43 @@ class ClientDetailsScreen extends StatefulWidget {
 
 class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
   final ClientController controller = Get.find<ClientController>();
-  final String clientId = Get.arguments as String;
+  late final String clientId;
 
   @override
   void initState() {
     super.initState();
-    controller.getClientById(clientId);
+    // Get the client ID from arguments
+    clientId = Get.arguments as String;
+
+    // Use a small delay to ensure widget tree is built before updating state
+    // This prevents the build-time setState error
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getClientById(clientId);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    String formatClientCapacity(String input) {
+      return input.split(' ').map((word) {
+        return word
+            .split('_')
+            .map((part) => part[0].toUpperCase() + part.substring(1))
+            .join(' ');
+      }).join(' ');
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Client Details'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Get.toNamed('/client-form', arguments: clientId);
-            },
-            tooltip: 'Edit Client',
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteConfirmation(context);
-            },
-            tooltip: 'Delete Client',
-          ),
-        ],
+        centerTitle: true,
+        actions: [],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         if (controller.error.isNotEmpty) {
           return Center(
             child: Column(
@@ -66,12 +69,12 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
             ),
           );
         }
-        
+
         final client = controller.selectedClient.value;
         if (client == null) {
           return const Center(child: Text('Client not found'));
         }
-        
+
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -91,9 +94,9 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       const Text(
                         'Client Information',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -115,14 +118,14 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       DetailItem(
                         icon: Icons.assignment_ind,
                         title: 'Capacity',
-                        value: client.capacity,
+                        value: formatClientCapacity(client.capacity),
                       ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Contact information card
               Card(
                 elevation: 3,
@@ -137,9 +140,9 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       const Text(
                         'Contact Information',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -172,7 +175,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Clinic information card
               Card(
                 elevation: 3,
@@ -187,9 +190,9 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       const Text(
                         'Clinic Information',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -203,7 +206,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // System information card
               Card(
                 elevation: 3,
@@ -218,9 +221,9 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       const Text(
                         'System Information',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                       const Divider(),
                       const SizedBox(height: 8),
@@ -228,13 +231,15 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                         DetailItem(
                           icon: Icons.access_time,
                           title: 'Created At',
-                          value: '${client.createdAt!.day}/${client.createdAt!.month}/${client.createdAt!.year}',
+                          value:
+                              '${client.createdAt!.day}/${client.createdAt!.month}/${client.createdAt!.year}',
                         ),
                       if (client.updatedAt != null)
                         DetailItem(
                           icon: Icons.update,
                           title: 'Last Updated',
-                          value: '${client.updatedAt!.day}/${client.updatedAt!.month}/${client.updatedAt!.year}',
+                          value:
+                              '${client.updatedAt!.day}/${client.updatedAt!.month}/${client.updatedAt!.year}',
                         ),
                       if (client.id != null)
                         DetailItem(
@@ -250,35 +255,6 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
           ),
         );
       }),
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Client'),
-        content: const Text(
-          'Are you sure you want to delete this client? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              controller.deleteClient(clientId);
-              Get.back();
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

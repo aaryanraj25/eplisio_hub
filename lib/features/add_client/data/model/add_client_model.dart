@@ -4,8 +4,8 @@ class AddClientModel {
   final String designation;
   final String department;
   final String clinicId;
-  final String mobile;
-  final String email;
+  final String? mobile;
+  final String? email;
   final String capacity;
   final String? clinicName;
   final String? organizationId;
@@ -19,8 +19,8 @@ class AddClientModel {
     required this.designation,
     required this.department,
     required this.clinicId,
-    required this.mobile,
-    required this.email,
+    this.mobile,
+    this.email,
     required this.capacity,
     this.clinicName,
     this.organizationId,

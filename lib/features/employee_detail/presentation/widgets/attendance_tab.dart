@@ -2,6 +2,7 @@ import 'package:eplisio_hub/features/employee_detail/data/model/employee_detail_
 import 'package:eplisio_hub/features/employee_detail/presentation/controller/employee_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class AttendanceTab extends GetView<EmployeeDetailController> {
   const AttendanceTab({Key? key}) : super(key: key);
@@ -39,9 +40,8 @@ class AttendanceTab extends GetView<EmployeeDetailController> {
 
   Widget _buildAttendanceList({required bool isWFH}) {
     return Obx(() {
-      final attendance = isWFH 
-          ? controller.wfhAttendance 
-          : controller.regularAttendance;
+      final attendance =
+          isWFH ? controller.wfhAttendance : controller.regularAttendance;
 
       if (attendance.isEmpty) {
         return Center(
@@ -113,7 +113,10 @@ class AttendanceTab extends GetView<EmployeeDetailController> {
               children: [
                 _buildTimeColumn(
                   'Clock In',
-                  attendance.formattedClockIn,
+                  DateFormat('hh:mm a').format(
+                    attendance.clockInTime
+                        .add(const Duration(hours: 5, minutes: 30)),
+                  ),
                   Icons.login,
                   Colors.green,
                 ),
@@ -124,7 +127,10 @@ class AttendanceTab extends GetView<EmployeeDetailController> {
                 ),
                 _buildTimeColumn(
                   'Clock Out',
-                  attendance.formattedClockOut,
+                  DateFormat('hh:mm a').format(
+                    attendance.clockOutTime!
+                        .add(const Duration(hours: 5, minutes: 30)),
+                  ),
                   Icons.logout,
                   Colors.red,
                 ),
@@ -181,7 +187,9 @@ class AttendanceTab extends GetView<EmployeeDetailController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isOngoing ? Colors.green.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+        color: isOngoing
+            ? Colors.green.withOpacity(0.1)
+            : Colors.blue.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -206,4 +214,3 @@ class AttendanceTab extends GetView<EmployeeDetailController> {
     );
   }
 }
-

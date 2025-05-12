@@ -19,23 +19,28 @@ class EmployeeDetailModel {
   factory EmployeeDetailModel.fromJson(Map<String, dynamic> json) {
     return EmployeeDetailModel(
       employee: EmployeeModel.fromJson(json['employee']),
-      orders: (json['orders'] as List).map((e) => OrderModel.fromJson(e)).toList(),
+      orders:
+          (json['orders'] as List).map((e) => OrderModel.fromJson(e)).toList(),
       sales: (json['sales'] as List).map((e) => SaleModel.fromJson(e)).toList(),
-      attendance: (json['attendance'] as List).map((e) => AttendanceModel.fromJson(e)).toList(),
-      clients: (json['clients'] as List).map((e) => ClientModel.fromJson(e)).toList(),
+      attendance: (json['attendance'] as List)
+          .map((e) => AttendanceModel.fromJson(e))
+          .toList(),
+      clients: (json['clients'] as List)
+          .map((e) => ClientModel.fromJson(e))
+          .toList(),
     );
   }
 }
 
 class OrderModel {
   final String id;
-  final String clinicHospitalName;
-  final String clinicHospitalAddress;
+  final String? clinicHospitalName;
+  final String? clinicHospitalAddress;
   final List<OrderItemModel> items;
   final double totalAmount;
-  final String paymentStatus;
-  final String deliveredStatus;
-  final DateTime orderDate;
+  final String? paymentStatus;
+  final String? deliveredStatus;
+  final DateTime? orderDate;
   final String employeeId;
   final String organizationId;
   final DateTime createdAt;
@@ -44,13 +49,13 @@ class OrderModel {
 
   OrderModel({
     required this.id,
-    required this.clinicHospitalName,
-    required this.clinicHospitalAddress,
+    this.clinicHospitalName,
+    this.clinicHospitalAddress,
     required this.items,
     required this.totalAmount,
-    required this.paymentStatus,
-    required this.deliveredStatus,
-    required this.orderDate,
+    this.paymentStatus,
+    this.deliveredStatus,
+    this.orderDate,
     required this.employeeId,
     required this.organizationId,
     required this.createdAt,
@@ -63,16 +68,22 @@ class OrderModel {
       id: json['_id'],
       clinicHospitalName: json['clinic_hospital_name'],
       clinicHospitalAddress: json['clinic_hospital_address'],
-      items: (json['items'] as List).map((e) => OrderItemModel.fromJson(e)).toList(),
+      items: (json['items'] as List)
+          .map((e) => OrderItemModel.fromJson(e))
+          .toList(),
       totalAmount: (json['total_amount'] as num).toDouble(),
       paymentStatus: json['payment_status'],
       deliveredStatus: json['delivered_status'],
-      orderDate: DateTime.parse(json['order_date']),
+      orderDate: json['order_date'] != null
+          ? DateTime.parse(json['order_date'])
+          : null,
       employeeId: json['employee_id'],
       organizationId: json['organization_id'],
       createdAt: DateTime.parse(json['created_at']),
       status: json['status'],
-      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'])
+          : null,
     );
   }
 }
@@ -96,9 +107,9 @@ class OrderItemModel {
     return OrderItemModel(
       productId: json['product_id'],
       name: json['name'],
-      quantity: json['quantity'],
-      price: (json['price'] as num).toDouble(),
-      totalAmount: (json['total_amount'] as num).toDouble(),
+      quantity: json['quantity'] ?? 0,
+      price: (json['price'] ?? 0).toDouble(),
+      totalAmount: (json['total_amount'] ?? json['total'] ?? 0).toDouble(),
     );
   }
 }
@@ -130,7 +141,9 @@ class SaleModel {
       employeeId: json['employee_id'],
       totalAmount: (json['total_amount'] as num).toDouble(),
       date: DateTime.parse(json['date']),
-      items: (json['items'] as List).map((e) => OrderItemModel.fromJson(e)).toList(),
+      items: (json['items'] as List)
+          .map((e) => OrderItemModel.fromJson(e))
+          .toList(),
     );
   }
 }
@@ -164,16 +177,26 @@ class AttendanceModel {
       date: DateTime.parse(json['date']),
       workFromHome: json['work_from_home'],
       organizationId: json['organization_id'],
-      clockOutTime: json['clock_out_time'] != null ? DateTime.parse(json['clock_out_time']) : null,
-      totalHours: json['total_hours'] != null ? (json['total_hours'] as num).toDouble() : null,
+      clockOutTime: json['clock_out_time'] != null
+          ? DateTime.parse(json['clock_out_time'])
+          : null,
+      totalHours: json['total_hours'] != null
+          ? (json['total_hours'] as num).toDouble()
+          : null,
     );
   }
 
-  String get formattedClockIn => DateFormat('hh:mm a').format(clockInTime);
-  String get formattedClockOut => clockOutTime != null 
-      ? DateFormat('hh:mm a').format(clockOutTime!) 
+  static final _istOffset = const Duration(hours: 5, minutes: 30);
+
+  String get formattedClockIn =>
+      DateFormat('hh:mm a').format(clockInTime.toUtc().add(_istOffset));
+
+  String get formattedClockOut => clockOutTime != null
+      ? DateFormat('hh:mm a').format(clockOutTime!.toUtc().add(_istOffset))
       : 'Not clocked out';
-  String get formattedDate => DateFormat('MMM dd, yyyy').format(date);
+
+  String get formattedDate =>
+      DateFormat('MMM dd, yyyy').format(date.toUtc().add(_istOffset));
 }
 
 class ClientModel {
@@ -253,7 +276,8 @@ class LocationModel {
     );
   }
 
-  String get formattedLastUpdate => DateFormat('MMM dd, yyyy hh:mm a').format(updatedAt);
+  String get formattedLastUpdate =>
+      DateFormat('MMM dd, yyyy hh:mm a').format(updatedAt);
 }
 
 class TrackingModel {

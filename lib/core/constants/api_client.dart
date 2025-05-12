@@ -7,7 +7,7 @@ class ApiClient {
   late Dio _dio;
   final _storage = GetStorage();
   
-  static const String baseUrl = 'https://eplisio-backend-crm-production.up.railway.app';
+  static const String baseUrl = 'https://eplisio-backend-production.up.railway.app';
 
   ApiClient() {
     _dio = Dio(

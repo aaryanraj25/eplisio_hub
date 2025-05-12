@@ -44,12 +44,16 @@ class OrderRepository {
 
   Future<void> updateOrderStatus(String orderId, String status) async {
     try {
-      await apiClient.patch(
-        '/orders/admin/admin/orders/$orderId/status',
-        data: {'status': status},
+      final response = await apiClient.put(  // Changed to PATCH
+        '/orders/admin/admin/orders/$orderId/status?status=$status',  // Added status as query parameter
         headers: _headers,
       );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update order status: ${response.statusCode}');
+      }
     } catch (e) {
+      print('Error updating order status: $e');
       throw Exception('Failed to update order status: $e');
     }
   }

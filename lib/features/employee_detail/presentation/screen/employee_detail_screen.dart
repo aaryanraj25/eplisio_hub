@@ -344,9 +344,9 @@ class BasicInfoTab extends GetView<EmployeeDetailController> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
-                title: Text(order.clinicHospitalName),
+                title: Text(order.clinicHospitalName ?? 'No clinic name'),
                 subtitle: Text(
-                  '${DateFormat('MMM dd, yyyy').format(order.orderDate)}\n₹${order.totalAmount}',
+                  '${order.orderDate != null ? DateFormat('MMM dd, yyyy').format(order.orderDate!) : 'Date not available'}\n₹${order.totalAmount.toStringAsFixed(2)}',
                 ),
                 trailing: _buildStatusChip(order.status),
               ),

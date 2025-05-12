@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class OrderController extends GetxController with GetTickerProviderStateMixin {
   final OrderRepository _repository;
-  
+
   OrderController(this._repository);
 
   // Orders lists for each tab
@@ -37,6 +37,9 @@ class OrderController extends GetxController with GetTickerProviderStateMixin {
   final RxString completedSearch = ''.obs;
   final RxString pendingSearch = ''.obs;
   final RxString rejectedSearch = ''.obs;
+
+  final RxString loadingOrderId = ''.obs;
+  final RxBool isUpdatingStatus = false.obs;
 
   late TabController tabController;
 
@@ -176,30 +179,37 @@ class OrderController extends GetxController with GetTickerProviderStateMixin {
 
     try {
       isLoadingPending.value = true;
+
+      // Add query parameters for pagination and status
       final response = await _repository.getOrders(
         'pending',
         page: pendingPage.value,
+        limit: 10, // You can adjust this value as needed
       );
 
       if (refresh) {
         pendingOrders.clear();
       }
 
-      hasMorePending.value = response.page < response.pages;
-
-      if (response.orders.isEmpty) {
-        hasMorePending.value = false;
-      } else {
+      // Check if response data exists and has the expected structure
+      if (response.orders.isNotEmpty) {
         pendingOrders.addAll(response.orders);
         pendingPage.value++;
+
+        // Update hasMore based on total pages
+        hasMorePending.value = pendingPage.value <= response.pages;
+      } else {
+        hasMorePending.value = false;
       }
     } catch (e) {
+      hasMorePending.value = false;
       Get.snackbar(
         'Error',
-        'Failed to fetch pending orders',
+        'Failed to fetch pending orders: ${e.toString()}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
     } finally {
       isLoadingPending.value = false;
@@ -248,11 +258,27 @@ class OrderController extends GetxController with GetTickerProviderStateMixin {
 
   Future<void> updateOrderStatus(String orderId, String status) async {
     try {
+      loadingOrderId.value = orderId;
+      isUpdatingStatus.value = true;
+
       await _repository.updateOrderStatus(orderId, status);
-      
-      // Refresh all lists since order status changed
-      fetchAllOrders();
-      
+
+      // Refresh current tab data
+      switch (tabController.index) {
+        case 0:
+          await fetchProspectiveOrders(refresh: true);
+          break;
+        case 1:
+          await fetchCompletedOrders(refresh: true);
+          break;
+        case 2:
+          await fetchPendingOrders(refresh: true);
+          break;
+        case 3:
+          await fetchRejectedOrders(refresh: true);
+          break;
+      }
+
       Get.snackbar(
         'Success',
         'Order status updated successfully',
@@ -268,6 +294,63 @@ class OrderController extends GetxController with GetTickerProviderStateMixin {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
+    } finally {
+      loadingOrderId.value = '';
+      isUpdatingStatus.value = false;
+    }
+  }
+
+  Future<void> acceptOrder(String orderId) async {
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Confirm Accept'),
+        content: const Text('Are you sure you want to accept this order?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Accept'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await updateOrderStatus(orderId, 'accepted');
+    }
+  }
+
+  Future<void> rejectOrder(String orderId) async {
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Confirm Reject'),
+        content: const Text('Are you sure you want to reject this order?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Reject'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await updateOrderStatus(orderId, 'rejected');
     }
   }
 

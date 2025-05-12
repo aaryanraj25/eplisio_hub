@@ -264,8 +264,8 @@ class ClientController extends GetxController {
     nameController.text = client.name;
     designationController.text = client.designation;
     departmentController.text = client.department;
-    mobileController.text = client.mobile;
-    emailController.text = client.email;
+    mobileController.text = client.mobile ?? '';
+    emailController.text = client.email ?? '';
     selectedHospitalId.value = client.clinicId;
     selectedCapacity.value = ClientCapacity.fromString(client.capacity);
   }
@@ -286,15 +286,6 @@ class ClientController extends GetxController {
     }
     if (selectedHospitalId.value == null) {
       error.value = 'Please select a hospital';
-      return false;
-    }
-    if (mobileController.text.isEmpty) {
-      error.value = 'Mobile number is required';
-      return false;
-    }
-    if (emailController.text.isEmpty ||
-        !GetUtils.isEmail(emailController.text)) {
-      error.value = 'Valid email is required';
       return false;
     }
     return true;

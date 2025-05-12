@@ -149,7 +149,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       DetailItem(
                         icon: Icons.phone,
                         title: 'Mobile',
-                        value: client.mobile,
+                        value: client.mobile ?? '',
                         trailing: IconButton(
                           icon: const Icon(Icons.phone),
                           onPressed: () {
@@ -161,7 +161,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                       DetailItem(
                         icon: Icons.email,
                         title: 'Email',
-                        value: client.email,
+                        value: client.email ?? '',
                         trailing: IconButton(
                           icon: const Icon(Icons.email),
                           onPressed: () {

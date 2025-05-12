@@ -134,10 +134,10 @@ class ClientCard extends StatelessWidget {
                         child: _buildContactItem(
                           context,
                           Icons.phone,
-                          client.mobile,
+                          client.mobile ?? '',
                           () {
                             _copyToClipboard(
-                                context, client.mobile, 'Phone number');
+                                context, client.mobile ?? '', 'Phone number');
                           },
                         ),
                       ),
@@ -146,9 +146,9 @@ class ClientCard extends StatelessWidget {
                         child: _buildContactItem(
                           context,
                           Icons.email,
-                          client.email,
+                          client.email ?? '',
                           () {
-                            _copyToClipboard(context, client.email, 'Email');
+                            _copyToClipboard(context, client.email ?? '', 'Email');
                           },
                         ),
                       ),
